@@ -2,6 +2,7 @@ package main
 
 import (
 	"go-fiber-url-shortener/database"
+	"go-fiber-url-shortener/router"
 	"log"
 	"os"
 
@@ -31,6 +32,8 @@ func main() {
 	}))
 
 	database.ConnectDB()
+
+	router.Initialize(app)
 
 	log.Fatal(app.Listen(":" + getenv("PORT", "3000")))
 }
