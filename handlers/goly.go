@@ -3,8 +3,10 @@ package handlers
 import (
 	"go-fiber-url-shortener/database"
 	"go-fiber-url-shortener/model"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
+	"gorm.io/gorm"
 )
 
 func CreateGoly(c *fiber.Ctx) error {
@@ -32,7 +34,58 @@ func CreateGoly(c *fiber.Ctx) error {
 }
 
 func UpdateGoly(c *fiber.Ctx) error {
-	return nil
+	type UpdateGolyRequest struct {
+		ShortUrl string `json:"shortUrl"`
+		FullUrl  string `json:"fullUrl"`
+	}
+
+	updateGolyRequest := new(UpdateGolyRequest)
+
+	var bodyParserError error = c.BodyParser(updateGolyRequest)
+
+	if bodyParserError != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"message": "invalid incoming request values",
+		})
+	}
+
+	param := c.Params("id")
+
+	id, err := strconv.Atoi(param)
+
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"message": "invalid ID format",
+		})
+	}
+
+	found := model.Goly{}
+
+	query := model.Goly{
+		ID: id,
+	}
+
+	err = database.DB.First(&found, &query).Error
+
+	if err == gorm.ErrRecordNotFound {
+		return c.Status(400).JSON(fiber.Map{
+			"message": "Goly not found",
+		})
+	}
+
+	if updateGolyRequest.ShortUrl != "" {
+		found.ShortUrl = updateGolyRequest.ShortUrl
+	}
+
+	if updateGolyRequest.FullUrl != "" {
+		found.FullUrl = updateGolyRequest.FullUrl
+	}
+
+	database.DB.Save(&found)
+
+	return c.Status(200).JSON(fiber.Map{
+		"message": "success",
+	})
 }
 
 func DeleteGoly(c *fiber.Ctx) error {
