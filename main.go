@@ -10,18 +10,20 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func getenv(key, fallback string) string {
-	value := os.Getenv(key)
+func getenv(key string, fallback string) string {
+	var value string = os.Getenv(key)
+
 	if len(value) == 0 {
 		return fallback
 	}
+
 	return value
 }
 
 func main() {
 	godotenv.Load()
 
-	app := fiber.New()
+	var app *fiber.App = fiber.New()
 
 	app.Use(cors.New(cors.Config{
 		AllowOrigins: "*",

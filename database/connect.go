@@ -12,9 +12,9 @@ import (
 func ConnectDB() {
 	var err error
 
-	env := os.Getenv("DATABASE_URL")
+	var databaseUrl string = os.Getenv("DATABASE_URL")
 
-	DB, err = gorm.Open(postgres.Open(env), &gorm.Config{})
+	DB, err = gorm.Open(postgres.Open(databaseUrl), &gorm.Config{})
 
 	if err != nil {
 		log.Fatal(err)
