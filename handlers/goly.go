@@ -89,7 +89,35 @@ func UpdateGoly(c *fiber.Ctx) error {
 }
 
 func DeleteGoly(c *fiber.Ctx) error {
-	return nil
+	param := c.Params("id")
+
+	id, err := strconv.Atoi(param)
+
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"message": "invalid ID format",
+		})
+	}
+
+	found := model.Goly{}
+
+	query := model.Goly{
+		ID: id,
+	}
+
+	err = database.DB.First(&found, &query).Error
+
+	if err == gorm.ErrRecordNotFound {
+		return c.Status(400).JSON(fiber.Map{
+			"message": "Goly not found",
+		})
+	}
+
+	database.DB.Delete(&found)
+
+	return c.Status(204).JSON(fiber.Map{
+		"message": "success",
+	})
 }
 
 func GetAllGolies(c *fiber.Ctx) error {
