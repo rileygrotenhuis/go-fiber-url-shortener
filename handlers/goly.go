@@ -120,10 +120,6 @@ func DeleteGoly(c *fiber.Ctx) error {
 	})
 }
 
-func GetAllGolies(c *fiber.Ctx) error {
-	return nil
-}
-
 func GolyRedirect(c *fiber.Ctx) error {
 	shortUrl := c.Params("id")
 
