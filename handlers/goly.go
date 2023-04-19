@@ -125,5 +125,21 @@ func GetAllGolies(c *fiber.Ctx) error {
 }
 
 func GolyRedirect(c *fiber.Ctx) error {
-	return nil
+	shortUrl := c.Params("id")
+
+	found := model.Goly{}
+
+	query := model.Goly{
+		ShortUrl: shortUrl,
+	}
+
+	err := database.DB.First(&found, &query).Error
+
+	if err == gorm.ErrRecordNotFound {
+		return c.Status(400).JSON(fiber.Map{
+			"message": "Goly not found",
+		})
+	}
+
+	return c.Redirect(found.FullUrl, fiber.StatusTemporaryRedirect)
 }
